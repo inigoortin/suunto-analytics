@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suunto Training Dashboard</title>
+<style>
+:root{--bg:#fff;--soft:#f6f6f7;--text:#111418;--muted:#5a6067;--faint:#697077;--line:#e7e8ea;--accent:#cd390a;--accent2:#fbb39c;--good:#16a34a;--warn:#b78c09;--bad:#e5484d;--blue:#2b6fd6;--purple:#6d4fd1;--z1:#8c939c;--z2:#3d8bd9;--z3:#2fa55a;--z4:#d17d0d;--z5:#e5484d;--deep:#3b3496;--rem:#1b9aa3;--light:#4b97db;--awake:#e87013;--run:#f4511e;--walk:#14a39a;--gym:#7a5ad8;--bike:#2b6fd6;--hike:#3a9a4a;--stretch:#d0679a;--other:#8a8f96;--c1:#2b6a99;--c2:#cf7f0f;--c3:#3a9b4d;--c4:#c43b5f;--c5:#529d98;--ink:#2a2e33}
+:root[data-theme=dark]{--bg:#0f1114;--soft:#181b1f;--text:#eceef0;--muted:#9aa0a7;--faint:#7f858c;--line:#262a2f;--accent:#ff6a3d;--accent2:#7a3a26;--good:#3ccf74;--warn:#e7b92e;--bad:#ff6b6f;--blue:#5c9cf2;--purple:#a28bf2;--z1:#7b828a;--z2:#539ee6;--z3:#45bf6d;--z4:#f5ad42;--z5:#ff6b6f;--deep:#7468ea;--rem:#3fc3c9;--light:#3c74aa;--awake:#f19a55;--c1:#5b9bd0;--c2:#f2b04a;--c3:#52b865;--c4:#e0607f;--c5:#6cc0bb;--ink:#d8dce0}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1114;--soft:#181b1f;--text:#eceef0;--muted:#9aa0a7;--faint:#7f858c;--line:#262a2f;--accent:#ff6a3d;--accent2:#7a3a26;--good:#3ccf74;--warn:#e7b92e;--bad:#ff6b6f;--blue:#5c9cf2;--purple:#a28bf2;--z1:#7b828a;--z2:#539ee6;--z3:#45bf6d;--z4:#f5ad42;--z5:#ff6b6f;--deep:#7468ea;--rem:#3fc3c9;--light:#3c74aa;--awake:#f19a55;--c1:#5b9bd0;--c2:#f2b04a;--c3:#52b865;--c4:#e0607f;--c5:#6cc0bb;--ink:#d8dce0}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+a{color:inherit}button{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{max-width:1440px;margin:0 auto;padding:0 28px;display:flex;align-items:center;gap:28px;height:56px}
+.brand{font-weight:700;letter-spacing:.02em;white-space:nowrap}.brand span{color:var(--accent)}
+.tabs{display:flex;gap:22px;height:100%;overflow-x:auto;scrollbar-width:none}
+.tabs button{all:unset;cursor:pointer;color:var(--muted);height:100%;display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button:hover{color:var(--text)}.tabs button.on{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+.tools{margin-left:auto;display:flex;gap:14px;align-items:center;color:var(--muted);font-size:13px;white-space:nowrap}
+.tools a{color:var(--accent);text-decoration:none;cursor:pointer}
+main{max-width:1440px;margin:0 auto;padding:30px 28px 80px}
+.screen{display:none}.screen.on{display:block}
+h1{font-size:26px;line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em}h1 .sub{color:var(--muted);font-weight:400}
+h2{font-size:19px;margin:0;font-weight:650;letter-spacing:-.005em}
+.lead{color:var(--muted);margin:4px 0 0}
+.sec{margin-top:40px;padding-top:26px;border-top:1px solid var(--line)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}.sec-h .note{color:var(--muted);font-size:13px}
+.muted{color:var(--muted)}.faint{color:var(--faint)}.small{font-size:13px}.nowrap{white-space:nowrap}
+.hero{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;margin:18px 0 6px}
+.big{font-size:76px;line-height:.9;font-weight:700;letter-spacing:-.03em}.big small{font-size:22px;color:var(--muted);font-weight:400;letter-spacing:0}
+.st{display:inline-flex;align-items:center;gap:8px}.st svg{flex:none}
+.factors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 28px;margin-top:10px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.metrics>div{padding:16px 18px 16px 0}.metrics>div+div{padding-left:18px;border-left:1px solid var(--line)}
+.m-k{color:var(--muted);font-size:13px}.m-v{font-size:30px;font-weight:650;letter-spacing:-.02em;line-height:1.15;margin-top:2px}.m-v small{font-size:15px;color:var(--muted);font-weight:400}
+.m-d{font-size:13px;color:var(--muted);margin-top:2px}.m-d b{color:var(--text);font-weight:600}
+.rows{border-top:1px solid var(--line)}
+.r{display:grid;align-items:center;gap:16px;padding:14px 4px;border-bottom:1px solid var(--line)}
+.r.click{cursor:pointer}.r.click:hover{background:var(--soft)}
+.day b{display:block}.day span{color:var(--muted);font-size:13px}
+.r.today{background:var(--soft)}
+.ico{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;flex:none}.ico svg{width:17px;height:17px}
+.ico.s{width:24px;height:24px}.ico.s svg{width:13px;height:13px}.ico.l{width:44px;height:44px}.ico.l svg{width:24px;height:24px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.hbar{height:6px;border-radius:3px;background:var(--soft);overflow:hidden;display:flex}.hbar i{display:block;height:100%}
+.num{text-align:right}
+.seg{display:inline-flex;background:var(--soft);border-radius:8px;padding:2px}
+.seg button{all:unset;cursor:pointer;padding:5px 12px;border-radius:6px;font-size:13px;color:var(--muted)}.seg button.on{background:var(--bg);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.btn{all:unset;cursor:pointer;padding:7px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px}.btn:hover{background:var(--soft)}
+.btn.pri{background:var(--text);color:var(--bg);border-color:var(--text)}
+.link{color:var(--accent);cursor:pointer;text-decoration:none;font-size:14px}
+.ch{width:100%;height:220px}.ch.s{height:160px}.ch.xs{height:120px}
+.cols{display:grid;gap:40px}.c2{grid-template-columns:repeat(2,minmax(0,1fr))}.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.rd{position:sticky;top:56px;z-index:10;background:var(--bg);display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:6px}
+.rd span{display:block;font-size:12px;color:var(--muted)}.rd b{font-size:17px;font-weight:600}
+.track .lab{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin:14px 0 0}.track .lab b{color:var(--text);font-weight:600;font-size:14px}
+table{width:100%;border-collapse:collapse}th{font-weight:400;color:var(--muted);font-size:13px;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:10px 6px;border-bottom:1px solid var(--line)}tr.tot td{font-weight:650;border-bottom:0}td.r,th.r{text-align:right;display:table-cell;padding:10px 6px;border-bottom:1px solid var(--line)}th.r{padding:8px 6px}.pt td.r,.pt th.r{padding:4px}
+.pbar{height:8px;border-radius:4px;background:var(--accent2)}.pbar.best{background:var(--accent)}
+.wk-nav{display:flex;gap:8px}
+.prof{display:flex;align-items:flex-end;gap:1px;height:26px;width:150px}.prof i{display:block;border-radius:1px}
+.editor{grid-column:1/-1;background:var(--soft);border-radius:10px;padding:18px 20px;margin:4px 0 6px;cursor:default}
+.steps{display:grid;gap:6px;margin-top:12px}
+.step{display:grid;grid-template-columns:14px 150px 110px 1fr 24px;gap:12px;align-items:center;background:var(--bg);border-radius:8px;padding:8px 12px}
+.step.rep{grid-template-columns:1fr 24px;background:transparent;padding:4px 2px;color:var(--muted);font-size:13px}
+.step.in{margin-left:22px}.step .sw{width:10px;height:10px;border-radius:2px}
+input,select{font:inherit;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px}input[type=number]{width:62px}
+.x{all:unset;cursor:pointer;color:var(--faint);text-align:center}.x:hover{color:var(--bad)}
+.editor .seg{background:var(--bg)}.editor .seg button.on{background:var(--soft)}
+.dash{background:var(--soft);border-radius:10px;padding:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.dash .wide{grid-column:1/-1}
+.pn{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px 14px 8px;min-width:0}.pn h3{margin:0;font-size:14px;font-weight:650}.pn .nt{color:var(--muted);font-size:12px;margin:1px 0 4px}.pn .ch{height:190px}
+.pt{font-size:12px;width:100%}.pt td,.pt th{padding:4px 4px}
+@media(max-width:1000px){.dash{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.dash{grid-template-columns:1fr}}
+.confirm{display:none;margin-top:12px;font-size:13px;color:var(--muted)}
+@media(max-width:900px){.factors{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr}.rd{grid-template-columns:repeat(4,1fr)}.cols.c2{grid-template-columns:1fr}}
+@media(max-width:640px){.bar{padding:0 16px;gap:16px}.tools{display:none}main{padding:22px 16px 60px}.factors{grid-template-columns:1fr}.big{font-size:58px}.r{grid-template-columns:1fr!important}.step{grid-template-columns:14px 1fr 90px 24px}}
+
+/* ---- dashboard ---- */
+#dash{margin:-30px -28px 0;padding:16px 20px 40px;background:var(--soft);min-height:100vh}
+.dg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;grid-auto-flow:row dense}.s2{grid-column:span 2}.s3{grid-column:1/-1}
+.pn{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:12px 14px 10px;min-width:0}
+.pn h3{margin:0;font-size:13px;font-weight:650}.pn .nt{color:var(--muted);font-size:11.5px;margin:1px 0 6px}
+.pn{display:flex;flex-direction:column}.pn .ch{flex:1 1 auto;height:auto}
+/* the chart canvas never sizes its box (avoids a resize feedback loop): the box comes from the layout only */
+.ch{position:relative}.ch>div:first-child{position:absolute!important;inset:0}.pn.compact .ch{flex:none}.pn.compact .pt td,.pn.compact .pt th{padding-top:2px;padding-bottom:2px}
+.hd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:28px;align-items:start}
+.goal{font-size:12.5px;color:var(--muted)}.goal b{color:var(--text)}.cd{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;margin:6px 0 2px}.cd small{font-size:16px;font-weight:500;color:var(--muted);letter-spacing:0;margin:0 14px 0 6px}
+.phase{display:flex;height:16px;border-radius:2px;overflow:hidden;margin:14px 0 3px;position:relative;font-size:10px;color:#fff;font-weight:600}.phase i{display:flex;align-items:center;padding-left:6px;font-style:normal;white-space:nowrap;overflow:hidden}
+.phase .now{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 18px}.kpis .k{font-size:11px;color:var(--muted)}.kpis .v{font-size:22px;font-weight:700;letter-spacing:-.01em}.kpis .v small{font-size:12px;font-weight:500;color:var(--muted)}.kpis .d{font-size:11px;color:var(--muted)}
+.src{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.src span{font-size:11px;border:1px solid var(--line);border-radius:3px;padding:2px 7px;color:var(--muted)}.src span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good);margin-right:5px;vertical-align:1px}.src span.off::before{background:transparent;border:1px solid var(--faint)}
+.mx{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:8px}
+.tile{border:1px solid var(--line);border-left:3px solid var(--good);border-radius:3px;padding:8px 10px;min-width:0}.tile.warn{border-left-color:var(--warn)}.tile.bad{border-left-color:var(--bad)}.tile.na{border-left-color:var(--line)}
+.tile .v{font-size:19px;font-weight:700;letter-spacing:-.01em}.tile .v small{font-size:11px;color:var(--muted);font-weight:500}.tile .l{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tile .x{font-size:9.5px;color:var(--faint)}
+.pt{font-size:12px;width:100%;border-collapse:collapse}.pt th{font-size:11px;padding:4px 5px;font-weight:500}.pt td{padding:5px;border-bottom:1px solid var(--line)}.pt td.r,.pt th.r{padding:5px;text-align:right}.pt tr.tot td{font-weight:700;border-top:1px solid var(--muted);border-bottom:0}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:16px;align-items:start}
+.ks3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}.ks3 .k{font-size:11px;color:var(--muted)}.ks3 .v{font-size:20px;font-weight:700}.ks3 .v small{font-size:11px;color:var(--muted);font-weight:500}
+.rlist{max-height:270px;overflow:auto;font-size:12px}.rlist div{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--line);cursor:pointer}.rlist div:hover,.rlist div.on{background:var(--soft)}.rlist b{font-weight:600}.rlist .tg{font-size:10px;color:var(--muted);text-align:right}
+.lbl{font-size:10px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px}
+.eg{font-size:10px;color:var(--faint);font-weight:400;margin-left:6px;border:1px dashed var(--faint);border-radius:2px;padding:0 4px}
+@media(max-width:1100px){.dg>.pn:last-child{grid-column:1/-1}.dg{grid-template-columns:repeat(2,minmax(0,1fr))}.s2{grid-column:1/-1}.mx{grid-template-columns:repeat(4,1fr)}.hd{grid-template-columns:1fr}}
+@media(max-width:700px){.dg{grid-template-columns:1fr}.mx{grid-template-columns:repeat(2,1fr)}.kpis{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}#dash{margin:-22px -16px 0;padding:12px}}
+.wkr{display:flex;gap:26px;flex-wrap:wrap;margin:12px 0 6px}.wkr .n{font-size:44px;font-weight:700;letter-spacing:-.03em;line-height:1}.wkr .n small{font-size:15px;color:var(--muted);font-weight:500;letter-spacing:0}.wkr .l{font-size:12px;color:var(--muted);margin-top:4px}.wkr .bar3{display:flex;gap:3px;margin-top:6px}.wkr .bar3 i{width:22px;height:5px;border-radius:2px;background:var(--line)}
+.cal{display:grid;grid-template-columns:88px repeat(7,minmax(0,1fr));gap:4px;font-size:11px}.cal .h{color:var(--muted);text-align:center;padding-bottom:2px}.cal .w{color:var(--muted);padding:6px 4px;line-height:1.35}.cal .w b{color:var(--text);font-size:12px}
+.cal .d{border:1px solid var(--line);border-radius:3px;min-height:64px;padding:4px;display:flex;flex-direction:column;gap:3px}.cal .d .dn{color:var(--faint);font-size:10px}.cal .d.today{border-color:var(--text)}.cal .d.fut{background:var(--soft);border-style:dashed}.cal .d .it{display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;overflow:hidden}.cal .d .it:hover{text-decoration:underline}
+.leaflet-container{font:inherit;background:var(--soft)}.osm-tiles{filter:grayscale(1) contrast(.9) brightness(1.05)}:root[data-theme=dark] .osm-tiles{filter:grayscale(1) invert(1) brightness(.85) contrast(.9)}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .osm-tiles{filter:grayscale(1) invert(1) brightness(.85) contrast(.9)}}
+</style>
+<link rel="stylesheet" href="vendor/leaflet-1.9.4.css">
+<script src="vendor/echarts-5.5.1.min.js"></script>
+<script src="vendor/leaflet-1.9.4.js"></script>
+</head>
+<body>
+<header><div class="bar">
+  <div class="brand">SUUNTO <span>ANALYTICS</span></div>
+  <nav class="tabs">
+    <button class="on" data-s="dash">Dashboard</button><button data-s="activities">Activities</button><button data-s="plan">Plan</button>
+  </nav>
+  <div class="tools"><span><span id="sync-txt"></span> · <a id="sync">Sync</a></span><div class="seg" id="theme"><button data-t="light">Light</button><button data-t="system" class="on">Auto</button><button data-t="dark">Dark</button></div></div>
+</div></header>
+
+<main>
+<section class="screen on" id="dash">
+<div class="dg">
+  <div class="pn s3"><div class="hd">
+    <div><div class="goal"><b>Training overview</b> · <span id="o-range"></span></div>
+      <div class="wkr" id="o-week"></div>
+      <div class="goal" id="o-note"></div>
+      <div class="src"><span>Suunto workouts</span><span>FIT 1 Hz</span><span>Sleep</span><span>Recovery 24/7</span><span>Steps &amp; HR 24/7</span><span>Suunto profile &amp; zones</span></div></div>
+    <div><div class="kpis" id="g-kpis"></div><div class="faint" style="font-size:11px;margin-top:10px">Hover a number for what it means.</div></div>
+  </div></div>
+
+  <div class="pn s2"><h3>Week by week</h3><div class="nt">every activity by day · target routine: 2–3 runs and 2–3 gym sessions a week · click an icon to open it</div><div class="cal" id="cal"></div></div>
+  <div class="pn "><h3>Sessions per week</h3><div class="nt">runs and weight training vs your 2–3 target (band) · stretching shown separately</div><div class="ch" id="o-sess" style="min-height:160px"></div></div>
+
+  <div class="pn s2"><h3>Routes</h3><div class="nt">your GPS tracks on an OpenStreetMap base map · click an activity</div>
+    <div class="two" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)"><div id="rt-map" style="height:300px;border-radius:3px"></div><div class="rlist" id="rt-list" style="max-height:300px"></div></div>
+    <div class="two" style="margin-top:8px;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)"><div><div class="nt" style="margin:0"><b id="rt-name"></b> · pace vs average over elevation</div><div class="ch" id="rt-dev" style="min-height:130px"></div></div><div><div class="nt" style="margin:0">Heart rate &amp; speed along the route</div><div class="ch" id="rt-hs" style="min-height:130px"></div></div></div></div>
+  <div class="pn compact"><h3>Heart rate – pace profile</h3><div class="nt">every running second · median pace per heart-rate band · coloured by your Suunto zones</div><div class="ch" id="lp-c" style="min-height:0;height:160px"></div><table class="pt" id="lp-t"></table></div>
+
+  <div class="pn s3"><h3>Fitness, fatigue and form</h3><div class="nt">your daily load · fitness = 42-day average, fatigue = 7-day average, form = fitness − fatigue · dashed: next 4 weeks if you keep 2–3 runs and 2–3 gym sessions a week</div><div class="ch" id="ff" style="min-height:250px"></div></div>
+
+  <div class="pn "><h3>Load ratio</h3><div class="nt">fatigue ÷ fitness per day · 0.8–1.3 is the safe band · high while history is short</div><div class="ch" id="ld-acwr" style="min-height:180px"></div></div>
+  <div class="pn "><h3>Weekly load &amp; ramp</h3><div class="nt">training load (TSS) per week · label: change vs the week before</div><div class="ch" id="ld-week" style="min-height:180px"></div></div>
+  <div class="pn "><h3>Load by day</h3><div class="nt">training load per day, this week vs last</div><div class="ch" id="ld-mono" style="min-height:180px"></div></div>
+
+  <div class="pn s2"><h3>Recovery &amp; readiness</h3><div class="nt">daily peak of Suunto recovery balance · green ≥ 70 · amber 50–69 · red &lt; 50 · line: end-of-day value</div><div class="ch" id="rr" style="min-height:170px"></div></div>
+  <div class="pn "><h3>Steps &amp; active energy</h3><div class="nt">per day from your 24/7 data · last day may be partial</div><div class="ch" id="st" style="min-height:170px"></div></div>
+
+  <div class="pn "><h3>HRV overnight</h3><div class="nt">ms per night · band: your normal range (mean ± 1 SD)</div><div class="ch" id="p-hrv" style="min-height:180px"></div></div>
+  <div class="pn "><h3>Resting heart rate</h3><div class="nt">lowest HR asleep and lowest 24/7 HR per day · bpm</div><div class="ch" id="p-rhr" style="min-height:180px"></div></div>
+  <div class="pn "><h3>Sleep</h3><div class="nt">hours per night by stage · line: 7 h</div><div class="ch" id="p-sleep" style="min-height:180px"></div></div>
+  <div class="pn "><h3>Bedtime</h3><div class="nt">time you fell asleep · bars: hours slept</div><div class="ch" id="p-bed" style="min-height:180px"></div></div>
+  <div class="pn "><h3>Recovery time vs load</h3><div class="nt">each workout · hours Suunto asks you to recover vs training load</div><div class="ch" id="p-rec" style="min-height:180px"></div></div>
+
+  <div class="pn s2"><h3>Weight training sessions</h3><div class="nt">each session · bars: minutes · dots: average heart rate</div><div class="ch" id="p-gym" style="min-height:200px"></div></div>
+  <div class="pn "><h3>Weekly hours by sport</h3><div class="nt">all recorded activity</div><div class="ch" id="p-hrs" style="min-height:200px"></div></div>
+
+  <div class="pn "><h3>Aerobic economy</h3><div class="nt">efficiency per km of each run (speed ÷ heart rate) · higher = more speed per beat</div><div class="ch" id="p-ef" style="min-height:180px"></div></div>
+  <div class="pn "><h3>Cadence</h3><div class="nt">steps per minute by km for each run · 165+ is a common target</div><div class="ch" id="p-cad" style="min-height:180px"></div></div>
+
+  <div class="pn"><h3>Last run, by halves</h3><div class="nt">does pace drop or heart rate drift in the second half?</div><div class="ks3" id="dc-k" style="grid-template-columns:repeat(3,1fr);gap:10px 8px;margin-top:6px"></div><div class="ch" id="dc-c" style="min-height:150px"></div></div>
+  <div class="pn "><h3>Pace at 140–150 bpm</h3><div class="nt">median pace in that heart-rate band per run · lower = fitter</div><div class="ch" id="p-p150" style="min-height:180px"></div></div>
+</div>
+</section>
+
+<section class="screen" id="activities">
+  <div class="sec-h"><h1>Activities</h1><div class="seg" id="a-filter"><button class="on" data-f="">All</button><button data-f="run">Running</button><button data-f="walk">Walking</button><button data-f="gym">Weights</button><button data-f="stretch">Stretching</button></div></div>
+  <div id="a-list"></div>
+</section>
+<section class="screen" id="detail">
+  <a class="link" data-go="activities">← Activities</a>
+  <div style="display:flex;gap:16px;align-items:center;margin-top:12px" id="d-head"></div>
+  <div class="metrics" style="margin-top:22px" id="d-metrics"></div>
+  <div class="sec" style="margin-top:28px;padding-top:18px">
+    <div class="sec-h"><h2>Recording</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><div class="seg" id="res"><button data-r="1">1 s</button><button data-r="10" class="on">10 s</button><button data-r="60">1 min</button></div><div class="seg" id="xax"><button data-x="t" class="on">Time</button><button data-x="d">Distance</button></div></div></div>
+    <div class="rd" id="rd"></div>
+    <div id="tracks"></div>
+    <p class="faint small">Scroll or pinch on a chart to zoom, drag to pan, double-click to reset. All charts move together.</p>
+  </div>
+  <div class="sec" id="d-splits-sec"><div class="sec-h"><h2>Splits</h2><span class="note">per km · longer bar = faster</span></div><div class="m-k">Heart rate per km vs run average</div><div class="ch xs" id="d-hrkm" style="height:110px;margin-bottom:10px"></div><table id="d-splits"></table></div>
+  <div class="sec"><div class="cols c2"><div><div class="sec-h"><h2>Heart-rate zones</h2></div><div id="d-zones"></div></div><div><div class="sec-h"><h2>Effort</h2></div><div id="d-effort"></div></div></div></div>
+</section>
+<section class="screen" id="plan">
+  <div class="sec-h"><div><h1>Training plan</h1><div class="lead" id="p-lead"></div></div><div class="wk-nav"><button class="btn" id="p-prev">‹ Prev</button><button class="btn" id="p-next">Next ›</button></div></div>
+  <div class="metrics" id="p-metrics"></div>
+  <div class="rows" style="margin-top:22px" id="p-days"></div>
+  <p class="faint small" style="margin-top:14px">Click a workout to edit it. Plans are saved in this browser only. Sending a workout to the watch (as a SuuntoPlus Guide) comes later; for now use Export.</p>
+</section>
+</main>
+<script src="boot.js"></script>
+</body>
+</html>
