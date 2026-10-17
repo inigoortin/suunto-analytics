@@ -53,7 +53,7 @@ Full detail (tables, metric formulas, sync policy): [docs/ARCHITECTURE.md](docs/
 ## Technical decisions and problems solved
 - **Local database instead of live API calls.** Claude queries SQLite, not Suunto. Answers are instant, work offline,
   cost few tokens (tools return compact summaries, not raw dumps), and Claude never triggers traffic to Suunto.
-- **Being polite to an unofficial backend.** Every call goes through one client: one request at a time, 3–5 s apart,
+- **Being polite to an unofficial backend.** Every call goes through one throttled runner: one request at a time, 3–5 s apart,
   at most 60 calls per run, session reused. Any 401/403/429 starts a 24 h cooldown shared by the CLI and the
   dashboard, so a mistake can't turn into hammering the server.
 - **Re-parse without re-downloading.** Raw responses are cached locally, so `suunto reparse` rebuilds every table after
@@ -77,6 +77,8 @@ macOS Keychain holds it); the session token belongs to suuntool. The MCP server 
 from OpenStreetMap (loading them shares the map area with the tile server); everything else works offline.
 
 ## Run it
+Tested on macOS. Linux should work; Windows is untested (suuntool supports macOS and Linux only).
+
 1. `uv sync`
 2. Install the community `suuntool` binary yourself (unofficial; may violate Suunto's ToS — use at your own risk).
    Verify its checksum, then point to it: `export SUUNTOOL_BIN=~/suuntool-bin/suuntool`
