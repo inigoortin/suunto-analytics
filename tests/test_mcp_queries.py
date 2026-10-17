@@ -148,6 +148,25 @@ def test_server_registers_tools_and_calls(tmp_path, monkeypatch):
     assert "z" in str(res)
 
 
+def test_every_tool_is_annotated_read_only():
+    from suunto_analytics.mcp import server
+
+    tools = asyncio.run(server.server.list_tools())
+    assert len(tools) == 13
+    for t in tools:
+        assert t.annotations is not None, t.name
+        sent = t.annotations.model_dump(by_alias=True)  # field names as clients receive them
+        assert {
+            k: sent[k]
+            for k in ("readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint")
+        } == {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        }, t.name
+
+
 def test_run_sql_output_and_resource_caps(conn):
     big = q.run_sql(conn, "SELECT hex(zeroblob(100000)) AS x")
     assert (
